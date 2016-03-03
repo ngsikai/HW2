@@ -70,7 +70,7 @@ def querify(postfix):
 def optimize_postfix(postfix, index):
     chain_count = 1
     operation = postfix[index]
-    while index < len(postfix) - 1:
+    while index + 1 < len(postfix):
         if postfix[index + 1] == operation:
             chain_count += 1
             index += 1
