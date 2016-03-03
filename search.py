@@ -2,10 +2,11 @@ import os
 import getopt
 import sys
 import nltk
+import pickle
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem.porter import *
 from sets import Set
-import pickle
+from shunting_yard import *
 
 
 def search_index(dictionary_file, postings_file, queries_file, output_file):
@@ -16,19 +17,21 @@ def search_index(dictionary_file, postings_file, queries_file, output_file):
     query_list.pop()
     search_results = open(output_file, 'w')
 
-    stemmer = PorterStemmer()
     for query in query_list:
-        query = stemmer.stem(query).lower()
-        if query in dictionary:
-            freq = dictionary[query][0]
-            pointer = dictionary[query][1]
-            postings_list.seek(pointer)
-            results_list = postings_list.read(freq * 15 - 1).split(" ")
-            results_list.pop()
-            results_list = map((lambda x: int(x, 2)), results_list)
-            print results_list
-        else:
-            print "not found!"
+        query_obj = get_query_obj(query, dictionary)
+
+    # for query in query_list:
+    #     query = stemmer.stem(query).lower()
+    #     if query in dictionary:
+    #         freq = dictionary[query][0]
+    #         pointer = dictionary[query][1]
+    #         postings_list.seek(pointer)
+    #         results_list = postings_list.read(freq * 15 - 1).split(" ")
+    #         results_list.pop()
+    #         results_list = map((lambda x: int(x, 2)), results_list)
+    #         print results_list
+    #     else:
+    #         print "not found!"
 
 
 def usage():

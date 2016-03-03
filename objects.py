@@ -28,10 +28,10 @@ class Query:
         self.value1 = value1
         self.value2 = value2
         self.op = op
-        if op is "AND":
-            self.freq = min(value1.get_freq, value2.get_freq)
-        elif op is "OR":
-            self.freq = value1.get_freq + value2.get_freq
+        if op == "AND":
+            self.freq = min(value1.get_freq(), value2.get_freq())
+        elif op == "OR":
+            self.freq = value1.get_freq() + value2.get_freq()
         self.is_not = False
 
     def get_value1(self):
