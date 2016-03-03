@@ -10,6 +10,9 @@ class Word:
     def get_freq(self):
         return self.freq
 
+    def set_freq(self, new_freq):
+        self.freq = new_freq
+
     def get_is_not(self):
         return self.is_not
 
@@ -45,6 +48,9 @@ class Query:
 
     def get_freq(self):
         return self.freq
+
+    def set_freq(self, new_freq):
+        self.freq = new_freq
 
     def get_is_not(self):
         return self.is_not

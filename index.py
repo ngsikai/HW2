@@ -65,6 +65,8 @@ def build_index(input_doc_path, output_file_d, output_file_p):
                 postings[pointer].append(doc_name)
 
     dictionary = write_postings(dictionary, postings, postings_file)
+    dictionary["DOCUMENT_COUNT"] = len(doc_names)
+    print dictionary["DOCUMENT_COUNT"]
     write_dictionary(dictionary, dictionary_file)
 
 

@@ -1,8 +1,12 @@
 from objects import *
 from nltk.stem.porter import *
 
+document_count = 0
+
 
 def get_query_obj(query_str, dictionary):
+    global document_count
+    document_count = dictionary["DOCUMENT_COUNT"]
     return querify(get_postfix(query_str, dictionary))
 
 
@@ -46,6 +50,7 @@ def get_postfix(infix, dictionary):
 
 
 def querify(postfix):
+    global document_count
     index = 1
     while len(postfix) > 1:
         element = postfix[index]
@@ -61,6 +66,7 @@ def querify(postfix):
         elif element == "NOT":
             operand = postfix[index - 1]
             operand.toggle_is_not()
+            operand.set_freq(document_count - operand.get_freq())
             postfix.pop(index)
             # index remains the same
         else:
@@ -133,8 +139,8 @@ precedence_dict = {"OR": 3, "AND": 2, "NOT": 1}
 # test_list.append("OR")
 # print test_list
 
-test_dict = {"A": [200, 0], "B": [1000, 0], "C": [1000, 0], "D": [1, 0]}
+test_dict = {"A": [200, 0], "B": [1000, 0], "C": [1000, 0], "D": [1, 0], "DOCUMENT_COUNT": 2000}
 
-infix = "A AND (B AND C) AND D"
+infix = "A AND B AND NOT D"
 print get_postfix(infix, test_dict)
 print get_query_obj(infix, test_dict)
