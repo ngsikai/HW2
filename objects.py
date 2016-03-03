@@ -22,16 +22,22 @@ class Word:
         else:
             return self.value
 
+    def __eq__(self, other):
+        if not isinstance(other, Word):
+            return False
+        else:
+            return cmp(self.__dict__, other.__dict__)
+
 
 class Query:
     def __init__(self, value1, value2, op):
         self.value1 = value1
         self.value2 = value2
         self.op = op
-        if op is "AND":
-            self.freq = min(value1.get_freq, value2.get_freq)
-        elif op is "OR":
-            self.freq = value1.get_freq + value2.get_freq
+        if op == "AND":
+            self.freq = min(value1.get_freq(), value2.get_freq())
+        elif op == "OR":
+            self.freq = value1.get_freq() + value2.get_freq()
         self.is_not = False
 
     def get_value1(self):
@@ -57,3 +63,12 @@ class Query:
             return "(" + str(self.value1) + "," + str(self.value2) + "," + str(self.op) + ",!)"
         else:
             return "(" + str(self.value1) + "," + str(self.value2) + "," + str(self.op) + ")"
+
+    def __eq__(self, other):
+        if not isinstance(other, Query):
+            return False
+        else:
+            for v1, v2 in zip(self.__dict__, other.__dict__):
+                if not cmp(v1, v2):
+                    return False
+            return True

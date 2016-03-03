@@ -47,7 +47,6 @@ def querify(postfix):
     while len(postfix) > 1:
         element = postfix[index]
         if element == "AND" or element == "OR":
-            postfix = optimize_postfix(postfix, index)
             operand1 = postfix[index - 2]
             operand2 = postfix[index - 1]
             query_obj = Query(operand1, operand2, element)
@@ -121,6 +120,6 @@ precedence_dict = {"OR": 3, "AND": 2, "NOT": 1}
 
 test_dict = {"A": [20, 0], "B": [10, 0], "C": [10, 0], "D": [10, 0], "E": [10, 0]}
 
-infix = "A OR B AND (C OR D) AND NOT E"
-print get_postfix(infix, test_dict)
-print get_query_obj(infix, test_dict)
+# infix = "A OR B AND (C OR D) AND NOT E"
+# print get_postfix(infix, test_dict)
+# print get_query_obj(infix, test_dict)
