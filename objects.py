@@ -25,6 +25,12 @@ class Word:
         else:
             return self.value
 
+    def __eq__(self, other):
+        if not isinstance(other, Word):
+            return False
+        else:
+            return cmp(self.__dict__, other.__dict__)
+
 
 class Query:
     def __init__(self, value1, value2, op):
@@ -63,3 +69,12 @@ class Query:
             return "(" + str(self.value1) + "," + str(self.value2) + "," + str(self.op) + ",!)"
         else:
             return "(" + str(self.value1) + "," + str(self.value2) + "," + str(self.op) + ")"
+
+    def __eq__(self, other):
+        if not isinstance(other, Query):
+            return False
+        else:
+            for v1, v2 in zip(self.__dict__, other.__dict__):
+                if not cmp(v1, v2):
+                    return False
+            return True

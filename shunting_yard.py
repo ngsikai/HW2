@@ -20,10 +20,10 @@ def get_postfix(infix, dictionary):
         current_token = tokens_list.pop(0)
 
         if is_variable(current_token):
+            current_token = stemmer.stem(current_token).lower()
             term_freq = 0
             if current_token in dictionary:
                 term_freq = dictionary[current_token][0]
-            current_token = stemmer.stem(current_token).lower()
             word_obj = Word(current_token, term_freq)
             postfix.append(word_obj)
 
@@ -55,7 +55,6 @@ def querify(postfix):
     while len(postfix) > 1:
         element = postfix[index]
         if element == "AND" or element == "OR":
-            postfix = optimize_postfix(postfix, index)
             operand1 = postfix[index - 2]
             operand2 = postfix[index - 1]
             query_obj = Query(operand1, operand2, element)
@@ -139,8 +138,9 @@ precedence_dict = {"OR": 3, "AND": 2, "NOT": 1}
 # test_list.append("OR")
 # print test_list
 
-test_dict = {"A": [200, 0], "B": [1000, 0], "C": [1000, 0], "D": [1, 0], "DOCUMENT_COUNT": 2000}
 
-infix = "A AND B AND NOT D"
-print get_postfix(infix, test_dict)
-print get_query_obj(infix, test_dict)
+# test_dict = {"A": [200, 0], "B": [1000, 0], "C": [1000, 0], "D": [1, 0]}
+
+# infix = "A AND (B AND C) AND D"
+# print get_postfix(infix, test_dict)
+# print get_query_obj(infix, test_dict)
