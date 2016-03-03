@@ -8,22 +8,24 @@ from nltk.stem.porter import *
 from sets import Set
 from shunting_yard import *
 from merge import *
+import timeit
 
 
 def search_index(dictionary_file, postings_file, queries_file, output_file):
     dictionary = pickle.load(open(dictionary_file, 'rb'))
     postings_list = open(postings_file, 'r')
     query_list = open(queries_file, 'r').read().split("\n")
-    # To remove the last '' item
-    query_list.pop()
     search_results = open(output_file, 'w')
 
     for query in query_list:
         query_obj = get_query_obj(query, dictionary)
-        return process_query_obj(query_obj, dictionary, postings_list)
+        output_list = process_query_obj(query_obj, dictionary, postings_list)
+        search_results.write(stringify(output_list))
 
 
 def process_query_obj(query_obj, dictionary, postings_list):
+    all_doc_ids = dictionary["ALL_TERMS"]
+
     if isinstance(query_obj, Word):
         term = query_obj.value
         if term in dictionary:
@@ -31,15 +33,20 @@ def process_query_obj(query_obj, dictionary, postings_list):
             pointer = dictionary[term][1]
             results_list = get_results_list(freq, pointer, postings_list)
             if query_obj.is_not:
-                results_list = merge_not(results_list)
+                results_list = negate(results_list, all_doc_ids)
             return results_list
         elif query_obj.is_not:
-            # return full postings list of all doc IDs
+            return all_doc_ids
+        else:
+            return []
 
     elif isinstance(query_obj, Query):
-        postings_list1 = process_query_obj(query_obj.value1)
-        postings_list2 = process_query_obj(query_obj.value2)
-        return merge(postings_list1, postings_list2, query.op, query.is_not)
+        postings_list1 = process_query_obj(query_obj.value1, dictionary, postings_list)
+        postings_list2 = process_query_obj(query_obj.value2, dictionary, postings_list)
+        results_list = merge(postings_list1, postings_list2, query_obj.op)
+        if query_obj.is_not:
+            results_list = negate(results_list, all_doc_ids)
+        return results_list
 
 
 def get_results_list(freq, pointer, postings_list):
@@ -49,6 +56,31 @@ def get_results_list(freq, pointer, postings_list):
     results_list = map((lambda x: int(x, 2)), results_list)
     return results_list
 
+
+def negate(list1, list2):
+    result = []
+    ptr1 = 0
+    ptr2 = 0
+    while ptr1 < len(list1) and ptr2 < len(list2):
+        if list1[ptr1] == list2[ptr2]:
+            ptr1 += 1
+            ptr2 += 1
+        elif list1[ptr1] > list2[ptr2]:
+            result.append(list2[ptr2])
+            ptr2 += 1
+        else:
+            ptr1 += 1
+    while (ptr2 < len(list2)):
+            result.append(list2[ptr2])
+            ptr2 += 1
+    return result
+
+
+def stringify(list):
+    ans = ""
+    for element in list:
+        ans += str(element) + " "
+    return ans.strip() + "\n"
 
 def usage():
     print "usage: " + sys.argv[0] + " -d dictionary-file -p postings-file -q file-of-queries -o output-file-of-results"
@@ -73,5 +105,6 @@ for o, a in opts:
 if input_file_d is None or input_file_p is None or input_file_q is None or output_file is None:
     usage()
     sys.exit(2)
+
 
 search_index(input_file_d, input_file_p, input_file_q, output_file)
