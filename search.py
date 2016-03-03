@@ -7,6 +7,7 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem.porter import *
 from sets import Set
 from shunting_yard import *
+from merge import *
 
 
 def search_index(dictionary_file, postings_file, queries_file, output_file):
@@ -19,19 +20,34 @@ def search_index(dictionary_file, postings_file, queries_file, output_file):
 
     for query in query_list:
         query_obj = get_query_obj(query, dictionary)
+        return process_query_obj(query_obj, dictionary, postings_list)
 
-    # for query in query_list:
-    #     query = stemmer.stem(query).lower()
-    #     if query in dictionary:
-    #         freq = dictionary[query][0]
-    #         pointer = dictionary[query][1]
-    #         postings_list.seek(pointer)
-    #         results_list = postings_list.read(freq * 15 - 1).split(" ")
-    #         results_list.pop()
-    #         results_list = map((lambda x: int(x, 2)), results_list)
-    #         print results_list
-    #     else:
-    #         print "not found!"
+
+def process_query_obj(query_obj, dictionary, postings_list):
+    if isinstance(query_obj, Word):
+        term = query_obj.value
+        if term in dictionary:
+            freq = dictionary[term][0]
+            pointer = dictionary[term][1]
+            results_list = get_results_list(freq, pointer, postings_list)
+            if query_obj.is_not:
+                results_list = merge_not(results_list)
+            return results_list
+        elif query_obj.is_not:
+            # return full postings list of all doc IDs
+
+    elif isinstance(query_obj, Query):
+        postings_list1 = process_query_obj(query_obj.value1)
+        postings_list2 = process_query_obj(query_obj.value2)
+        return merge(postings_list1, postings_list2, query.op, query.is_not)
+
+
+def get_results_list(freq, pointer, postings_list):
+    postings_list.seek(pointer)
+    results_list = postings_list.read(freq * 15 - 1).split(" ")
+    results_list.pop()
+    results_list = map((lambda x: int(x, 2)), results_list)
+    return results_list
 
 
 def usage():
