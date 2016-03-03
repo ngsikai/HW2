@@ -11,15 +11,15 @@ def print_issue(qn, ans, result):
     print ans
     print " "
 
-term_dict = { "A": [1, 1], "B": [2,2], "C": [3,3], "D": [4,4], "E": [5,5]}
+term_dict = { "a": [1, 1], "b": [2,2], "c": [3,3], "d": [4,4], "e": [5,5]}
 
-A = Word("A", 1)
-B = Word("B", 2)
-C = Word("C", 3)
-D = Word("D", 4)
-E = Word("E", 5)
+A = Word("a", 1)
+B = Word("b", 2)
+C = Word("c", 3)
+D = Word("d", 4)
+E = Word("e", 5)
 
-not_A = Word("A", 1)
+not_A = Word("a", 1)
 not_A.toggle_is_not()
 not_A_or_B = Query(A, B, "OR")
 not_A_or_B.toggle_is_not()
