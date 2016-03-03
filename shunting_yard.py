@@ -1,4 +1,5 @@
 from objects import *
+from nltk.stem.porter import *
 
 
 def get_query_obj(query_str, dictionary):
@@ -9,6 +10,7 @@ def get_postfix(infix, dictionary):
     tokens_list = add_whitespaces(infix).split()
     postfix = []
     op_stack = []
+    stemmer = PorterStemmer()
 
     while tokens_list:
         current_token = tokens_list.pop(0)
@@ -17,6 +19,7 @@ def get_postfix(infix, dictionary):
             term_freq = 0
             if current_token in dictionary:
                 term_freq = dictionary[current_token][0]
+            current_token = stemmer.stem(current_token).lower()
             word_obj = Word(current_token, term_freq)
             postfix.append(word_obj)
 
@@ -67,12 +70,23 @@ def querify(postfix):
 def optimize_postfix(postfix, index):
     chain_count = 1
     operation = postfix[index]
-    while index < len(postfix):
+    while index < len(postfix) - 1:
         if postfix[index + 1] == operation:
             chain_count += 1
+            index += 1
         else:
+            # go back to the last element of the chain
+            index -= 1
             break
-
+    if chain_count is not 1:
+        right_bound = index - chain_count
+        left_bound = right_bound - chain_count
+        term_list = postfix[left_bound:right_bound + 1]
+        for i in range(left_bound, right_bound + 1):
+            highest_freq_term = max(term_list, key=lambda x: x.get_freq())
+            postfix[i] = highest_freq_term
+            term_list.remove(highest_freq_term)
+    return postfix
 
 
 def add_whitespaces(str):
@@ -118,8 +132,8 @@ precedence_dict = {"OR": 3, "AND": 2, "NOT": 1}
 # test_list.append("OR")
 # print test_list
 
-test_dict = {"A": [20, 0], "B": [10, 0], "C": [10, 0], "D": [10, 0], "E": [10, 0]}
+test_dict = {"A": [200, 0], "B": [1000, 0], "C": [1000, 0], "D": [1, 0]}
 
-# infix = "A OR B AND (C OR D) AND NOT E"
+# infix = "A AND (B AND C) AND D"
 # print get_postfix(infix, test_dict)
 # print get_query_obj(infix, test_dict)
