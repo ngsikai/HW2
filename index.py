@@ -4,7 +4,6 @@ import sys
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem.porter import *
-from sets import Set
 import pickle
 
 
@@ -48,7 +47,7 @@ def build_index(input_doc_path, output_file_d, output_file_p):
 
     for doc_name in doc_names:
         doc = open(input_doc_path + '/' + doc_name, 'r').read()
-        term_list = Set()
+        term_list = set()
         for sentence in sent_tokenize(doc):
             for word in word_tokenize(sentence):
                 token = stemmer.stem(word).lower()
