@@ -8,9 +8,10 @@ from nltk.stem.porter import *
 from sets import Set
 from shunting_yard import *
 from merge import *
-import timeit
 
 
+# Function that loops through each line in query file,
+# performs query and writes result of query to output file
 def search_index(dictionary_file, postings_file, queries_file, output_file):
     dictionary = pickle.load(open(dictionary_file, 'rb'))
     postings_list = open(postings_file, 'r')
@@ -29,6 +30,10 @@ def search_index(dictionary_file, postings_file, queries_file, output_file):
             search_results.write("\n")
 
 
+# Function that takes in Query object, dictionary and postings lists
+# to output result of query
+# by recursively unwrapping Query objects and performing merges 
+# until base case of Word object is reached
 def process_query_obj(query_obj, dictionary, postings_list):
     all_doc_ids = dictionary["ALL_TERMS"]
 
@@ -37,25 +42,26 @@ def process_query_obj(query_obj, dictionary, postings_list):
         if term in dictionary:
             freq = dictionary[term][0]
             pointer = dictionary[term][1]
-            results_list = get_results_list(freq, pointer, postings_list)
+            posting_list = get_posting_list(freq, pointer, postings_list)
             if query_obj.is_not:
-                results_list = negate(results_list, all_doc_ids)
-            return results_list
+                posting_list = negate(posting_list, all_doc_ids)
+            return posting_list
         elif query_obj.is_not:
             return all_doc_ids
         else:
             return []
 
     elif isinstance(query_obj, Query):
-        postings_list1 = process_query_obj(query_obj.value1, dictionary, postings_list)
-        postings_list2 = process_query_obj(query_obj.value2, dictionary, postings_list)
-        results_list = merge(postings_list1, postings_list2, query_obj.op)
+        posting_list1 = process_query_obj(query_obj.value1, dictionary, postings_list)
+        posting_list2 = process_query_obj(query_obj.value2, dictionary, postings_list)
+        results_list = merge(posting_list1, posting_list2, query_obj.op)
         if query_obj.is_not:
             results_list = negate(results_list, all_doc_ids)
         return results_list
 
 
-def get_results_list(freq, pointer, postings_list):
+# Function that seeks, loads and returns a posting list
+def get_posting_list(freq, pointer, postings_list):
     postings_list.seek(pointer)
     results_list = postings_list.read(freq * 15 - 1).split(" ")
     results_list.pop()
@@ -63,6 +69,7 @@ def get_results_list(freq, pointer, postings_list):
     return results_list
 
 
+# Function that outputs a list with elements present in list2 but not in list1
 def negate(list1, list2):
     result = []
     ptr1 = 0
@@ -82,11 +89,13 @@ def negate(list1, list2):
     return result
 
 
+# Function that converts list to string for writing to file
 def stringify(list):
     ans = ""
     for element in list:
         ans += str(element) + " "
     return ans.strip()
+
 
 def usage():
     print "usage: " + sys.argv[0] + " -d dictionary-file -p postings-file -q file-of-queries -o output-file-of-results"

@@ -66,11 +66,3 @@ def merge_or(list1, list2):
         result.append(list2[ptr2])
         ptr2 += 1
     return result
-
-
-# first = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 16, 32, 64, 67, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 128]
-# second = [1, 2, 3, 5, 8, 13, 21, 34]
-# third = [128, 129, 130, 131, 132, 133, 134, 135]
-# print len(first)
-# print merge_and(first, third)
-# print merge_or(first, second)

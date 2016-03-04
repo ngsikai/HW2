@@ -8,6 +8,8 @@ from sets import Set
 import pickle
 
 
+# Function that takes in a path string
+# and outputs a list of file names at the directory
 def get_doc_names(path):
     doc_names = os.listdir(path)
     doc_names = map(int, doc_names)
@@ -91,5 +93,6 @@ for o, a in opts:
 if input_doc_path is None or output_file_d is None or output_file_p is None:
     usage()
     sys.exit(2)
+
 
 build_index(input_doc_path, output_file_d, output_file_p)

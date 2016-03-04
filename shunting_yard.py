@@ -1,15 +1,21 @@
 from objects import *
 from nltk.stem.porter import *
 
+
 document_count = 0
 
 
+# Function that takes in raw query as query_str and dictionary
+# to output the Query object
 def get_query_obj(query_str, dictionary):
     global document_count
     document_count = dictionary["DOCUMENT_COUNT"]
     return querify(get_postfix(query_str, dictionary))
 
 
+# Helper function that takes in infix string and dictionary
+# to output the postfix list
+# using the shunting yard algorithm
 def get_postfix(infix, dictionary):
     tokens_list = add_whitespaces(infix).split()
     postfix = []
@@ -49,6 +55,8 @@ def get_postfix(infix, dictionary):
     return postfix
 
 
+# Helper function that takes in postfix list
+# to output the Query object
 def querify(postfix):
     global document_count
     index = 1
@@ -59,6 +67,7 @@ def querify(postfix):
             operand1 = postfix[index - 2]
             operand2 = postfix[index - 1]
             query_obj = Query(operand1, operand2, element)
+            # replace operand1, operand2 and element with query_obj
             postfix[index - 2] = query_obj
             postfix.pop(index - 1)
             postfix.pop(index - 1)
@@ -74,6 +83,9 @@ def querify(postfix):
     return postfix[0]
 
 
+# Helper function that takes in postfix list and index of operator
+# to output a reordered postfix list
+# that is optimised based on term frequency of operands
 def optimize_postfix(postfix, index):
     chain_count = 1
     operation = postfix[index]
@@ -89,10 +101,8 @@ def optimize_postfix(postfix, index):
         right_bound = index - chain_count
         left_bound = right_bound - chain_count
         term_list = postfix[left_bound:right_bound + 1]
+        # loop: choose operand of highest frequency and update postfix list
         for i in range(left_bound, right_bound + 1):
-            # highest_freq_term = max(term_list, key=lambda x: x.get_freq())
-            # postfix[i] = highest_freq_term
-            # term_list.pop(term_list.index(highest_freq_term))
             max_term = term_list[0]
             max_term_index = 0
             for index, element in enumerate(term_list):
@@ -104,6 +114,7 @@ def optimize_postfix(postfix, index):
     return postfix
 
 
+# Helper function that adds whitespaces after "(" and before ")"
 def add_whitespaces(str):
     processed_str = ""
     for char in str:
@@ -135,5 +146,6 @@ def is_variable(token):
         return False
     else:
         return True
+
 
 precedence_dict = {"OR": 3, "AND": 2, "NOT": 1}
