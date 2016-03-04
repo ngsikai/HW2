@@ -25,6 +25,12 @@ class Word:
         else:
             return self.value
 
+    def __str__(self):
+        if self.is_not:
+            return self.value + "!"
+        else:
+            return self.value
+
     def __eq__(self, other):
         if not isinstance(other, Word):
             return False
@@ -65,6 +71,12 @@ class Query:
         self.is_not = not(self.is_not)
 
     def __repr__(self):
+        if self.is_not:
+            return "(" + str(self.value1) + "," + str(self.value2) + "," + str(self.op) + ",!)"
+        else:
+            return "(" + str(self.value1) + "," + str(self.value2) + "," + str(self.op) + ")"
+
+    def __str__(self):
         if self.is_not:
             return "(" + str(self.value1) + "," + str(self.value2) + "," + str(self.op) + ",!)"
         else:
