@@ -78,9 +78,9 @@ def optimize_postfix(postfix, index):
     chain_count = 1
     operation = postfix[index]
     while index + 1 < len(postfix):
-        if postfix[index + 1] == operation:
+        index += 1
+        if postfix[index] == operation:
             chain_count += 1
-            index += 1
         else:
             # go back to the last element of the chain
             index -= 1
@@ -137,20 +137,3 @@ def is_variable(token):
         return True
 
 precedence_dict = {"OR": 3, "AND": 2, "NOT": 1}
-
-# TEST
-# A_obj = Word("A", 0, False)
-# B_obj = Word("B", 0, False)
-# test_list = []
-# test_list.append(A_obj)
-# test_list.append(B_obj)
-# test_list.append("OR")
-# print test_list
-
-
-test_dict = {"a": [200, 0], "b": [1000, 0], "c": [10, 0], "d": [1, 0], "e": [20, 0]}
-
-infix = "A AND B AND C OR D OR E"
-print get_postfix(infix, test_dict)
-print querify(get_postfix(infix, test_dict))
-# print get_query_obj(infix, test_dict)
