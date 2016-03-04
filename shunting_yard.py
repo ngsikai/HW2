@@ -55,6 +55,7 @@ def querify(postfix):
     while len(postfix) > 1:
         element = postfix[index]
         if element == "AND" or element == "OR":
+            postfix = optimize_postfix(postfix, index)
             operand1 = postfix[index - 2]
             operand2 = postfix[index - 1]
             query_obj = Query(operand1, operand2, element)
@@ -89,9 +90,17 @@ def optimize_postfix(postfix, index):
         left_bound = right_bound - chain_count
         term_list = postfix[left_bound:right_bound + 1]
         for i in range(left_bound, right_bound + 1):
-            highest_freq_term = max(term_list, key=lambda x: x.get_freq())
-            postfix[i] = highest_freq_term
-            term_list.remove(highest_freq_term)
+            # highest_freq_term = max(term_list, key=lambda x: x.get_freq())
+            # postfix[i] = highest_freq_term
+            # term_list.pop(term_list.index(highest_freq_term))
+            max_term = term_list[0]
+            max_term_index = 0
+            for index, element in enumerate(term_list):
+                if element.get_freq() > max_term.get_freq():
+                    max_term = element
+                    max_term_index = index
+            postfix[i] = max_term
+            term_list.pop(max_term_index)
     return postfix
 
 
@@ -139,8 +148,9 @@ precedence_dict = {"OR": 3, "AND": 2, "NOT": 1}
 # print test_list
 
 
-# test_dict = {"A": [200, 0], "B": [1000, 0], "C": [1000, 0], "D": [1, 0]}
+test_dict = {"a": [200, 0], "b": [1000, 0], "c": [10, 0], "d": [1, 0], "e": [20, 0]}
 
-# infix = "A AND (B AND C) AND D"
-# print get_postfix(infix, test_dict)
+infix = "A AND B AND C OR D OR E"
+print get_postfix(infix, test_dict)
+print querify(get_postfix(infix, test_dict))
 # print get_query_obj(infix, test_dict)

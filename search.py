@@ -18,9 +18,11 @@ def search_index(dictionary_file, postings_file, queries_file, output_file):
     search_results = open(output_file, 'w')
 
     for query in query_list:
-        query_obj = get_query_obj(query, dictionary)
-        output_list = process_query_obj(query_obj, dictionary, postings_list)
-        search_results.write(stringify(output_list))
+        # just in case blank line is caught as a query
+        if query != "":
+            query_obj = get_query_obj(query, dictionary)
+            output_list = process_query_obj(query_obj, dictionary, postings_list)
+            search_results.write(stringify(output_list))
 
 
 def process_query_obj(query_obj, dictionary, postings_list):
