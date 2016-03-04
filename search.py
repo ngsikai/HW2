@@ -17,12 +17,16 @@ def search_index(dictionary_file, postings_file, queries_file, output_file):
     query_list = open(queries_file, 'r').read().split("\n")
     search_results = open(output_file, 'w')
 
-    for query in query_list:
-        # just in case blank line is caught as a query
+    for index, query in enumerate(query_list):
+        # in case blank line is caught as a query, write an empty line
         if query != "":
             query_obj = get_query_obj(query, dictionary)
             output_list = process_query_obj(query_obj, dictionary, postings_list)
             search_results.write(stringify(output_list))
+            if index != len(query_list) - 1:
+                search_results.write("\n")
+        else:
+            search_results.write("\n")
 
 
 def process_query_obj(query_obj, dictionary, postings_list):
@@ -82,7 +86,7 @@ def stringify(list):
     ans = ""
     for element in list:
         ans += str(element) + " "
-    return ans.strip() + "\n"
+    return ans.strip()
 
 def usage():
     print "usage: " + sys.argv[0] + " -d dictionary-file -p postings-file -q file-of-queries -o output-file-of-results"
