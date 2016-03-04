@@ -78,9 +78,9 @@ def optimize_postfix(postfix, index):
     chain_count = 1
     operation = postfix[index]
     while index + 1 < len(postfix):
-        if postfix[index + 1] == operation:
+        index += 1
+        if postfix[index] == operation:
             chain_count += 1
-            index += 1
         else:
             # go back to the last element of the chain
             index -= 1
