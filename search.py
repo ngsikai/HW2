@@ -5,7 +5,6 @@ import nltk
 import pickle
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem.porter import *
-from sets import Set
 from shunting_yard import *
 from merge import *
 
@@ -32,7 +31,7 @@ def search_index(dictionary_file, postings_file, queries_file, output_file):
 
 # Function that takes in Query object, dictionary and postings lists
 # to output result of query
-# by recursively unwrapping Query objects and performing merges 
+# by recursively unwrapping Query objects and performing merges
 # until base case of Word object is reached
 def process_query_obj(query_obj, dictionary, postings_list):
     all_doc_ids = dictionary["ALL_TERMS"]
