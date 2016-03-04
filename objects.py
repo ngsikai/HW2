@@ -1,3 +1,31 @@
+# Examples of Word object:
+# 1) bill
+# 2) gates
+# 3) computer
+# 4) rich
+# 
+# Examples of Query object:
+# 1) "bill AND gates" becomes
+# => (bill,gates,AND)
+# => This Query obj has:
+# => Operand 1: bill - a Word obj
+# => Operand 2: gates - a Word obj
+# => Operator: AND
+#
+# 2) "bill AND gates OR computer" becomes
+# => (computer,(bill,gates,AND),OR)
+# => This Query obj has:
+# => Operand 1: computer - a Word obj
+# => Operand 2: (bill,gates,AND) - a Query obj
+# => Operator: OR
+#
+# 3) "bill AND gates OR computer AND rich" becomes
+# => ((bill,gates,AND),(computer,rich,AND),OR)
+# => Operand 1: (bill,gates,AND) - a Query obj
+# => Operand 2: (computer,rich,AND) - a Query obj
+# => Operator: OR
+
+
 class Word:
     def __init__(self, value, freq):
         self.value = value

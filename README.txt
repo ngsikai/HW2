@@ -7,33 +7,14 @@ architecture or experiments in general.  A paragraph or two is usually
 sufficient.
 
 Indexing:
-The training input is broken down to sentences, and further broken down to
-lists of characters after having their language labels removed. After each
-ngram is generated, a check will be run to check whether they are already inside
-the dictionary. If it is, one more count will be added to its number of
-occurrences for that particular ngram. If not, a new entry will be created with
-add-one smoothing done for every language, after which one more count will then
-be added to the corresponding language for that particular ngram.
+Each training file is broken down into sentences and then words using sent_tokenize() and word_tokenize() from nltk. Next, each word is stemmed using the PorterStemmer from nltk and changed to lowercase to form a token. For each training file, all its tokens are added to a set to ensure there are no repeated tokens. For each token in the set, the name (doc id) of the training file is appended to the postings list of the associated term. If the token is a new term in the dictionary, a postings list is created and the dictionary creates a new entry that points to the new postings list.
+
+The dictionary is pickled while the postings lists are written line by line.
 
 Searching:
-Preprocessing of test input is similar to the training phase, except that there
-is no language label to remove this time. For each ngram generated from the test
-input, the probability values of it occurring for each language will be computed.
-The logarithm function is used to prevent underflow of the small probability
-values once they get multiplied together. The language with the largest resulting
-probability value for the given sentence will then be flagged as the predicted
-language.
-There is however, one more caveat for Out Of Vocabulary languages -- "other"
-Using the approach above causes one sentence in the test input to slip through
-as a registered language. This is because ngrams that are unencountered by the
-trained LM are simply neglected and unaccounted for, meaning sentences
-containing absolute gibberish only need to have one sequence of 4 characters
-that have been registered in the LM to be considered a valid language.
-This loophole was dealt with by factoring the percentage of unencountered(invalid)
-ngrams there are in all ngrams generated. If more than 70% of the ngrams are
-unencountered, the sentence is considered Out Of Vocabulary. This threshold will
-be adjusted according to the amount of training input given as well as the size
-of each ngram.
+Each query in the query file is passed through the shunting yard algorithm in shunting_yard.py to create a single Query object, which will contain two Query or Word objects (see objects.py!). The modified shunting yard algorithm also optimizes AND and OR queries according to the frequencies of the available operands.
+
+The final Query object created will be unwrapped recursively in search.py, until the base case of a Word object is reached. The postings list of the Word object will then be read using seek() and read() functions. This recursive unwrapping will result in a series of merges, eventually producing the final postings list.
 
 == Files included with this submission ==
 
@@ -56,14 +37,15 @@ objects.py
 Module that contains the logic behind the Word and Query classes used in shunting_yard.py.
 
 shunting_yard.py
-Module that contains the logic behind the modified shunting_yard algorithm used
+Module that contains the logic behind the modified shunting yard algorithm used
 to process the boolean queries.
 
 dictionary.txt
-Dictionary
+Text file that stores the pickled dictionary
 
 postings.txt
-Desc
+Text file that stores the postings lists of doc ids in binary. 
+Each doc id is represented by 15 bits and then a space.
 
 README.txt
 Descriptions of submitted files as well as Statement of individual work.
@@ -75,8 +57,7 @@ Essay questions as part of the homework assignment.
 
 Please initial one of the following statements.
 
-[x] We, A0124828B and A0131188H, certify that I have followed the CS 3245 Information
-Retrieval class guidelines for homework assignments.  In particular, I
+[x] We, A0124828B and A0131188H, certify that I have followed the CS 3245 Information Retrieval class guidelines for homework assignments.  In particular, I
 expressly vow that I have followed the Facebook rule in discussing
 with others in doing the assignment and did not take notes (digital or
 printed) from the discussions.
@@ -95,6 +76,6 @@ I suggest that I should be graded as follows:
 <Please list any websites and/or people you consulted with for this
 assignment and state their role>
 
-Java Implementation of Boolean shunting_yard algorithm that we adapted for our
+Java Implementation of Boolean shunting yard algorithm that we adapted for our
 shunting_yard.py
 http://codereview.stackexchange.com/questions/89967/boolean-expressions-from-infix-to-postfix-notation-using-dijkstras-shunting-yar
